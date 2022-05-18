@@ -1,5 +1,5 @@
 <p align="center">
-  
+  <a>
     <img src="file:///Users/brianrochford/Pictures/ModelBracketPredictions.svg" width="120" />
   </a>
 </p>
