@@ -2,6 +2,7 @@
   <a>
     <img src="file:///Users/brianrochford/Pictures/ModelBracketPredictions.svg" width="120" />
   </a>
+  file:///Users/brianrochford/Pictures/ModelBracketPredictions.svg
 </p>
 <h1 align="center">
   Gatsby minimal starter
@@ -35,7 +36,7 @@
 
 4.  **Learn more**
 
-    - [Documentation](https://www.gatsbyjs.com/docs/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter)
+    - [Documentation](file:///Users/brianrochford/Pictures/ModelBracketPredictions.svg)
 
     - [Tutorials](https://www.gatsbyjs.com/tutorial/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter)
 
