@@ -98,6 +98,13 @@ const links = [
       "This links brings you to tableau public and the visuals show our predictive models top features based on a feature selection package in python for Random Forest, the correlation to seed, and possible upset probabilities from the first round matchups.",
     color: "#E95800",
   },
+  {
+    text: "2022 Random Forest Model March Madness Bracket Predictions",
+    url: "https://github.com/rochfordAnalyst/marchdatacrunch/blob/master/ModelBracketProb.png",
+    description:
+      "This visual shows the 2022 Madness Bracket with our Predictions listed in green if correct. Red for incorrect. The teams we choose had a probability of winning that was greater than or equal to 50%.",
+    color: "#E95800",
+  },
 ]
 
 // markup
