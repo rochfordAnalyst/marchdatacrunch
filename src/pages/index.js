@@ -1,21 +1,25 @@
 import * as React from "react"
 
-// styles
 const pageStyles = {
   color: "#232129",
-  padding: 96,
+  padding: 0,
   fontFamily: "-apple-system, Roboto, sans-serif, serif",
 }
+
 const headingStyles = {
+  color: "#900028",
   marginTop: 0,
-  marginBottom: 64,
-  maxWidth: 320,
+  marginBottom: 15,
+  maxWidth: 1500,
 }
 const headingAccentStyles = {
-  color: "#663399",
+  color: "#900028",
+
 }
 const paragraphStyles = {
-  marginBottom: 48,
+  marginTop:21,
+  paddingLeft:18,
+  marginBottom: 25,
 }
 const codeStyles = {
   color: "#8A6534",
@@ -26,17 +30,17 @@ const codeStyles = {
 }
 const listStyles = {
   marginBottom: 96,
-  paddingLeft: 0,
+  paddingLeft: 100,
 }
 const listItemStyles = {
   fontWeight: 300,
   fontSize: 24,
-  maxWidth: 560,
+  maxWidth: 1000,
   marginBottom: 30,
 }
 
 const linkStyle = {
-  color: "#8954A8",
+  color: "#585858",
   fontWeight: "bold",
   fontSize: 16,
   verticalAlign: "5%",
@@ -80,6 +84,13 @@ const badgeStyle = {
 
 // data
 const links = [
+  {
+    text: "Deloittes March Data Crunch Madness Competition Powerpoint Presentation",
+    url: "https://github.com/rochfordAnalyst/marchdatacrunch/blob/master/March%20Data%20Crunch%20Madness%202022.pptx",
+    description:
+      "This link brings you to the github location for our presentation regarding the results of our predictive model and insights derived from those results. The probabilities our model outputted was every possible permutation of team match ups for the 2022 NCAA March Madndess Bracket (including the teams who won or lost the play-in games).",
+    color: "#E95800",
+  },
   {
     text: "Edittessz Fordham Recursion - Analyzing Differences in Mortgage Markets based on Changes in Political Party Control",
     url: "https://public.tableau.com/app/profile/brian.rochford/viz/datasetvisuals/datasetvisualization?publish=yes",
