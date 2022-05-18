@@ -92,6 +92,13 @@ const links = [
     color: "#E95800",
   },
   {
+    text: "2022 March Madness Model Features and First Upset Probabilities based on Seed",
+    url: "https://public.tableau.com/app/profile/brian.rochford/viz/marchMadnessProbabilityModelVisuals/MarchMadnessVisuals?publish=yes",
+    description:
+      "This link brings you to the github location for our presentation regarding the results of our predictive model and insights derived from those results. The probabilities our model outputted was every possible permutation of team match ups for the 2022 NCAA March Madndess Bracket (including the teams who won or lost the play-in games).",
+    color: "#E95800",
+  },
+  {
     text: "Edittessz Fordham Recursion - Analyzing Differences in Mortgage Markets based on Changes in Political Party Control",
     url: "https://public.tableau.com/app/profile/brian.rochford/viz/datasetvisuals/datasetvisualization?publish=yes",
     description:
