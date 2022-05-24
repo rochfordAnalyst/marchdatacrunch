@@ -1,0 +1,1753 @@
+---
+title: "TeamRankingScrap"
+author: "brian rochford"
+date: "2/18/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+```{r }
+library(rvest)
+library(dplyr)
+library(stringr)
+library(stringi)
+library(data.table)
+library(knitr)
+library(tidyr)
+
+```
+
+
+```{r }
+#install.packages("XML")
+
+```
+```{r }
+#install.packages("sqldf")
+
+```
+no_outliers <- read_excel("/Users/brianrochford/Downloads/thirtyChangeOutliersremoved.xlsx")
+
+```{r }
+library(XML)
+```
+```{r }
+library(data.table)
+
+
+
+```
+
+```{r }
+#no_outliers <- read.csv("/Users/brianrochford/Downloads/thirtyChangeOutliersremoved.csv")
+mm_dataZ <- read.csv('NCAA_Tourney_2002_2021.csv')
+tr <- read.csv('Mov2002real.csv')
+```
+
+```{r }
+tr
+
+
+```
+
+```{r }
+dt1 <- data.table(mm_dataZ, key = "team1_teamname", "season") 
+dt2 <- data.table(tr, key = "Team", "Season")
+
+#joined.dt1.dt.2 <- dt1[dt2]
+
+```
+
+```{r }
+
+data <- dt1[ season != '2002'] 
+
+```
+```{r }
+data
+dt3 <- data.table(data, key = "team1_teamname") 
+
+```
+
+
+
+```{r }
+trURL <- "https://www.teamrankings.com/ncaa-basketball/stat/average-scoring-margin?date=2002-04-02"
+```
+
+# Attempt to scrape data from teamrankings
+```{r }
+# Attempt to scrape data from teamrankings
+tr_raw <- trURL %>% 
+    read_html() %>% 
+    html_nodes("table") %>% 
+    html_table(fill = TRUE, header = FALSE)
+
+(tr_df1 <- tr_raw[[1]])
+```
+#ken pom scrpaing
+```{r }
+kp_url <- "https://kenpom.com/index.php?y=2002"
+# Attempt to scrape data from teamrankings
+kp_raw <- kp_url %>% 
+    read_html() %>% 
+    html_nodes("table") %>% 
+    html_table(fill = TRUE, header = FALSE)
+
+(kp_df1 <- kp_raw[[1]])
+```
+```{r }
+kp_df1
+```
+
+
+```{r }
+advancedURL <- "https://www.sports-reference.com/cbb/seasons/2003-advanced-school-stats.html"
+```
+
+```{r }
+write.csv(tr_df1,"C:\\Users\\brianrochford\\Desktop\\Mov2002real.csv", row.names = FALSE)
+
+```
+
+```{r }
+
+jump <- list("3", "4", "5")
+site <- paste('https://www.sports-reference.com/cbb/seasons/200',
+              jump[1],'-advanced-school-stats.html', sep="")
+i <- 1
+dfList <- lapply(site, function(i) {
+    webpage <- read_html(i)
+    draft_table <- html_nodes(webpage, 'table')
+    draft <- html_table(draft_table)[[1]]
+})
+
+finaldf <- do.call(rbind, dfList)  
+```
+```{r }
+finaldf 
+```
+```{r }
+
+jump <- list("3", "4", "5")
+site <- paste('https://www.sports-reference.com/cbb/seasons/200',
+              jump[1],'-advanced-school-stats.html', sep="")
+i <- 1
+dfList <- lapply(site, function(i) {
+    webpage <- read_html(i)
+    draft_table <- html_nodes(webpage, 'table')
+    draft <- html_table(draft_table)[[1]]
+})
+
+finaldf <- do.call(rbind, dfList)  
+
+i 
+for (i in jump) {
+  site <- paste('https://www.sports-reference.com/cbb/seasons/200',
+              '5','-advanced-school-stats.html', sep="")
+
+  webpage2 <- read_html(site)
+  draft_table2 <- html_nodes(webpage2, 'table')
+  draft2 <- html_table(draft_table2)[[1]]
+  
+}
+  
+```
+```{r }
+g_url <- paste('https://www.sports-reference.com/cbb/seasons/200',
+              i,'-advanced-school-stats.html', sep="")
+```
+```{r }
+year <- list("2", "3", "4")
+i <- 2
+year[i]
+```
+
+
+#correct way to do it
+
+```{r }
+i <- 1
+#https://www.teamrankings.com/ncaa-basketball/stat/floor-percentage?date=2002-04-02 
+dates <- list("2002-04-02", "2003-04-08", "2004-04-06", "2005-04-05", "2006-04-04", "2007-04-03", "2008-04-08", "2009-04-07", "2010-04-06", "2011-04-04", "2012-04-02", "2013-04-08", "2014-04-07", "2015-04-06", "2016-04-05", "2017-04-04", "2018-04-03", "2019-04-09", "2020-03-12")
+while (i < 20) {
+  g_urlt <- paste("https://www.teamrankings.com/ncaa-basketball/stat/floor-percentage?date=",dates[i],sep="")
+  if (i == 1) {
+    gg_rawtr <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+
+  (gg_dft <- gg_rawtr[[1]])
+  gg_dft["season"] <- "2002"
+    
+    
+  }
+  if (i == 2) {
+    gg_raw2tr <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_dfZt <- gg_raw2tr[[1]])
+  gg_dfZt["season"] <- "2003"
+    
+  }
+  if (i == 3) {
+    gg_2004 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2004f <- gg_2004[[1]])
+  gg_2004f["season"] <- "2004"
+    
+  }
+  if (i == 4) {
+    gg_2005 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2005f <- gg_2005[[1]])
+  gg_2005f["season"] <- "2005"
+    
+  }
+  if (i == 5) {
+    gg_2006 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2006f <- gg_2006[[1]])
+  gg_2006f["season"] <- "2006"
+    
+  }
+  if (i == 6) {
+    gg_2007 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2007f <- gg_2007[[1]])
+  gg_2007f["season"] <- "2007"
+    
+  }
+  if (i == 7) {
+    gg_2008 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2008f <- gg_2008[[1]])
+  gg_2008f["season"] <- "2008"
+    
+  }
+  if (i == 8) {
+    gg_2009 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2009f <- gg_2009[[1]])
+  gg_2009f["season"] <- "2009"
+    
+  }
+  if (i == 9) {
+    gg_2010 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2010f <- gg_2010[[1]])
+  gg_2010f["season"] <- "2010"
+    
+  }
+  if (i == 10) {
+    gg_2011 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2011f <- gg_2011[[1]])
+  gg_2011f["season"] <- "2011"
+    
+  }
+  if (i == 11) {
+    gg_2012 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2012f <- gg_2012[[1]])
+  gg_2012f["season"] <- "2012"
+    
+  }
+  if (i == 12) {
+    gg_2013 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2013f <- gg_2013[[1]])
+  gg_2013f["season"] <- "2013"
+    
+  }
+  if (i == 13) {
+    gg_2014 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2014f <- gg_2014[[1]])
+  gg_2014f["season"] <- "2014"
+    
+  }
+  if (i == 14) {
+    gg_2015 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2015f <- gg_2015[[1]])
+  gg_2015f["season"] <- "2015"
+    
+  }
+  if (i == 15) {
+    gg_2016 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2016f <- gg_2016[[1]])
+  gg_2016f["season"] <- "2016"
+    
+  }
+  if (i == 16) {
+    gg_2017 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2017f <- gg_2017[[1]])
+  gg_2017f["season"] <- "2017"
+    
+  }
+  if (i == 17) {
+    gg_2018 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2018f <- gg_2018[[1]])
+  gg_2018f["season"] <- "2018"
+    
+  }
+  if (i == 18) {
+    gg_2019 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2019f <- gg_2019[[1]])
+  gg_2019f["season"] <- "2019"
+    
+  }
+  if (i == 19) {
+    gg_2020 <- g_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (gg_2020f <- gg_2020[[1]])
+  gg_2020f["season"] <- "2020"
+    
+  }
+  
+    
+
+  
+  i <- i + 1
+  
+}
+appendedDfAllYearsTeamFloorPct <- rbind(gg_dft, gg_dfZt, gg_2004f, gg_2005f, gg_2006f, gg_2007f, gg_2008f, gg_2009f, gg_2010f, gg_2011f, gg_2012f, gg_2013f, gg_2014f, gg_2015f, gg_2016f, gg_2017f, gg_2018f, gg_2019f, gg_2020f)
+
+```
+```{r }
+appendedDfAllYearsTeamFloorPct
+
+
+```
+
+```{r }
+write.csv(appendedDfAllYearsTeamFloorPct,"C:\\Users\\brianrochford\\Downloads\\trFloorPct.csv", row.names = FALSE)
+```
+
+
+#correct way to do it
+
+```{r }
+i <- 5
+#"2002-04-02", "2003-04-08", "2004-04-06", "2005-04-05", 
+#https://www.teamrankings.com/ncaa-basketball/stat/floor-percentage?date=2002-04-02 
+dates <- list("2006-04-04", "2007-04-03", "2008-04-08", "2009-04-07", "2010-04-06", "2011-04-04", "2012-04-02", "2013-04-08", "2014-04-07", "2015-04-06", "2016-04-05", "2017-04-04", "2018-04-03", "2019-04-09", "2020-03-12")
+while (i < 20) {
+  lg_urlt <- paste("https://www.teamrankings.com/ncaa-basketball/ranking/last-10-games-by-other?date=",dates[i],sep="")
+  
+  if (i == 5) {
+    lgg_2006 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2006f <- lgg_2006[[1]])
+  lgg_2006f["season"] <- "2006"
+    
+  }
+  if (i == 6) {
+    lgg_2007 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2007f <- lgg_2007[[1]])
+  lgg_2007f["season"] <- "2007"
+    
+  }
+  if (i == 7) {
+    lgg_2008 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2008f <- lgg_2008[[1]])
+  lgg_2008f["season"] <- "2008"
+    
+  }
+  if (i == 8) {
+    lgg_2009 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2009f <- lgg_2009[[1]])
+  lgg_2009f["season"] <- "2009"
+    
+  }
+  if (i == 9) {
+    lgg_2010 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2010f <- lgg_2010[[1]])
+  lgg_2010f["season"] <- "2010"
+    
+  }
+  if (i == 10) {
+    lgg_2011 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2011f <- lgg_2011[[1]])
+  lgg_2011f["season"] <- "2011"
+    
+  }
+  if (i == 11) {
+    lgg_2012 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2012f <- lgg_2012[[1]])
+  lgg_2012f["season"] <- "2012"
+    
+  }
+  if (i == 12) {
+    lgg_2013 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2013f <- lgg_2013[[1]])
+  lgg_2013f["season"] <- "2013"
+    
+  }
+  if (i == 13) {
+    lgg_2014 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2014f <- lgg_2014[[1]])
+  lgg_2014f["season"] <- "2014"
+    
+  }
+  if (i == 14) {
+    lgg_2015 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2015f <- lgg_2015[[1]])
+  lgg_2015f["season"] <- "2015"
+    
+  }
+  if (i == 15) {
+    lgg_2016 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2016f <- lgg_2016[[1]])
+  lgg_2016f["season"] <- "2016"
+    
+  }
+  if (i == 16) {
+    lgg_2017 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2017f <- lgg_2017[[1]])
+  lgg_2017f["season"] <- "2017"
+    
+  }
+  if (i == 17) {
+    lgg_2018 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2018f <- lgg_2018[[1]])
+  lgg_2018f["season"] <- "2018"
+    
+  }
+  if (i == 18) {
+    lgg_2019 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2019f <- lgg_2019[[1]])
+  lgg_2019f["season"] <- "2019"
+    
+  }
+  if (i == 19) {
+    lgg_2020 <- lg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (lgg_2020f <- lgg_2020[[1]])
+  lgg_2020f["season"] <- "2020"
+    
+  }
+  
+    
+
+  
+  i <- i + 1
+  
+}
+appendedDf2016Last10PowerRating <- rbind(lgg_2006f, lgg_2007f, lgg_2008f, lgg_2009f, lgg_2010f, lgg_2011f, lgg_2012f, lgg_2013f, lgg_2014f, lgg_2015f, lgg_2016f, lgg_2017f, lgg_2018f, lgg_2019f, lgg_2020f)
+
+```
+```{r }
+write.csv(appendedDf2016Last10PowerRating,"C:\\Users\\brianrochford\\Downloads\\LastTenPowerRank20062020.csv", row.names = FALSE)
+```
+write.csv(appendedDf2007predRankHomeAwayLastTenInConfSOS,"C:\\Users\\brianrochford\\Downloads\\predRankHomeAwayNeutralLastTenInConfSos20072020.csv", row.names = FALSE)
+appendedDf2007predRankHomeAwayLastTenInConfSOS 
+```{r }
+appendedDf2016Last10PowerRating
+```
+
+#predictive ranking overall, home, away, neatral, last10, inConf, SOS 
+```{r }
+i <- 6
+#"2002-04-02", "2003-04-08", "2004-04-06", "2005-04-05", 
+#https://www.teamrankings.com/ncaa-basketball/stat/floor-percentage?date=2002-04-02 
+dates <- list("2007-04-03", "2008-04-08", "2009-04-07", "2010-04-06", "2011-04-04", "2012-04-02", "2013-04-08", "2014-04-07", "2015-04-06", "2016-04-05", "2017-04-04", "2018-04-03", "2019-04-09", "2020-03-12")
+while (i < 20) {
+  plg_urlt <- paste("https://www.teamrankings.com/ncb/rankings/teams/?date=",dates[i],sep="")
+  
+  
+  if (i == 6) {
+    plgg_2007 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2007f <- plgg_2007[[1]])
+  plgg_2007f["season"] <- "2007"
+    
+  }
+  if (i == 7) {
+    plgg_2008 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2008f <- plgg_2008[[1]])
+  plgg_2008f["season"] <- "2008"
+    
+  }
+  if (i == 8) {
+    plgg_2009 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2009f <- plgg_2009[[1]])
+  plgg_2009f["season"] <- "2009"
+    
+  }
+  if (i == 9) {
+    plgg_2010 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2010f <- plgg_2010[[1]])
+  plgg_2010f["season"] <- "2010"
+    
+  }
+  if (i == 10) {
+    plgg_2011 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2011f <- plgg_2011[[1]])
+  plgg_2011f["season"] <- "2011"
+    
+  }
+  if (i == 11) {
+    plgg_2012 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2012f <- plgg_2012[[1]])
+  plgg_2012f["season"] <- "2012"
+    
+  }
+  if (i == 12) {
+    plgg_2013 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2013f <- plgg_2013[[1]])
+  plgg_2013f["season"] <- "2013"
+    
+  }
+  if (i == 13) {
+    plgg_2014 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2014f <- plgg_2014[[1]])
+  plgg_2014f["season"] <- "2014"
+    
+  }
+  if (i == 14) {
+    plgg_2015 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2015f <- plgg_2015[[1]])
+  plgg_2015f["season"] <- "2015"
+    
+  }
+  if (i == 15) {
+    plgg_2016 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2016f <- plgg_2016[[1]])
+  plgg_2016f["season"] <- "2016"
+    
+  }
+  if (i == 16) {
+    plgg_2017 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2017f <- plgg_2017[[1]])
+  plgg_2017f["season"] <- "2017"
+    
+  }
+  if (i == 17) {
+    plgg_2018 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2018f <- plgg_2018[[1]])
+  plgg_2018f["season"] <- "2018"
+    
+  }
+  if (i == 18) {
+    plgg_2019 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2019f <- plgg_2019[[1]])
+  plgg_2019f["season"] <- "2019"
+    
+  }
+  if (i == 19) {
+    plgg_2020 <- plg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (plgg_2020f <- plgg_2020[[1]])
+  plgg_2020f["season"] <- "2020"
+    
+  }
+  
+    
+
+  
+  i <- i + 1
+  
+}
+appendedDf2007predRankHomeAwayLastTenInConfSOS <- rbind(plgg_2007f, plgg_2008f, plgg_2009f, plgg_2010f, plgg_2011f, plgg_2012f, plgg_2013f, plgg_2014f, plgg_2015f, plgg_2016f, plgg_2017f, plgg_2018f, plgg_2019f, plgg_2020f)
+
+```
+
+```{r }
+write.csv(appendedDf2007predRankHomeAwayLastTenInConfSOS,"C:\\Users\\brianrochford\\Downloads\\predRankHomeAwayNeutralLastTenInConfSos20072020.csv", row.names = FALSE)
+
+```
+
+```{r }
+i <- 1
+#https://www.teamrankings.com/ncaa-basketball/stat/floor-percentage?date=2002-04-02 
+dates <- list("2002-04-02", "2003-04-08", "2004-04-06", "2005-04-05", "2006-04-04", "2007-04-03", "2008-04-08", "2009-04-07", "2010-04-06", "2011-04-04", "2012-04-02", "2013-04-08", "2014-04-07", "2015-04-06", "2016-04-05", "2017-04-04", "2018-04-03", "2019-04-09", "2020-03-12")
+while (i < 20) {
+  tg_urlt <- paste("https://www.teamrankings.com/ncaa-basketball/stat/opponent-true-shooting-percentage?date=",dates[i],sep="")
+  if (i == 1) {
+    tgg_rawtr <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+
+  (tgg_dft <- tgg_rawtr[[1]])
+  tgg_dft["season"] <- "2002"
+    
+    
+  }
+  if (i == 2) {
+    tgg_raw2tr <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_dfZt <- tgg_raw2tr[[1]])
+  tgg_dfZt["season"] <- "2003"
+    
+  }
+  if (i == 3) {
+    tgg_2004 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2004f <- tgg_2004[[1]])
+  tgg_2004f["season"] <- "2004"
+    
+  }
+  if (i == 4) {
+    tgg_2005 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2005f <- tgg_2005[[1]])
+  tgg_2005f["season"] <- "2005"
+    
+  }
+  if (i == 5) {
+    tgg_2006 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2006f <- tgg_2006[[1]])
+  tgg_2006f["season"] <- "2006"
+    
+  }
+  if (i == 6) {
+    tgg_2007 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2007f <- tgg_2007[[1]])
+  tgg_2007f["season"] <- "2007"
+    
+  }
+  if (i == 7) {
+    tgg_2008 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2008f <- tgg_2008[[1]])
+  tgg_2008f["season"] <- "2008"
+    
+  }
+  if (i == 8) {
+    tgg_2009 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2009f <- tgg_2009[[1]])
+  tgg_2009f["season"] <- "2009"
+    
+  }
+  if (i == 9) {
+    tgg_2010 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2010f <- tgg_2010[[1]])
+  tgg_2010f["season"] <- "2010"
+    
+  }
+  if (i == 10) {
+    tgg_2011 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2011f <- tgg_2011[[1]])
+  tgg_2011f["season"] <- "2011"
+    
+  }
+  if (i == 11) {
+    tgg_2012 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2012f <- tgg_2012[[1]])
+  tgg_2012f["season"] <- "2012"
+    
+  }
+  if (i == 12) {
+    tgg_2013 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2013f <- tgg_2013[[1]])
+  tgg_2013f["season"] <- "2013"
+    
+  }
+  if (i == 13) {
+    tgg_2014 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2014f <- tgg_2014[[1]])
+  tgg_2014f["season"] <- "2014"
+    
+  }
+  if (i == 14) {
+    tgg_2015 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2015f <- tgg_2015[[1]])
+  tgg_2015f["season"] <- "2015"
+    
+  }
+  if (i == 15) {
+    tgg_2016 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2016f <- tgg_2016[[1]])
+  tgg_2016f["season"] <- "2016"
+    
+  }
+  if (i == 16) {
+    tgg_2017 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2017f <- tgg_2017[[1]])
+  tgg_2017f["season"] <- "2017"
+    
+  }
+  if (i == 17) {
+    tgg_2018 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2018f <- tgg_2018[[1]])
+  tgg_2018f["season"] <- "2018"
+    
+  }
+  if (i == 18) {
+    tgg_2019 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2019f <- tgg_2019[[1]])
+  tgg_2019f["season"] <- "2019"
+    
+  }
+  if (i == 19) {
+    tgg_2020 <- tg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (tgg_2020f <- tgg_2020[[1]])
+  tgg_2020f["season"] <- "2020"
+    
+  }
+  
+    
+
+  
+  i <- i + 1
+  
+}
+appendedDfAllYearsOppTsPct2 <- rbind(tgg_dft, tgg_dfZt, tgg_2004f, tgg_2005f, tgg_2006f, tgg_2007f, tgg_2008f, tgg_2009f, tgg_2010f, tgg_2011f, tgg_2012f, tgg_2013f, tgg_2014f, tgg_2015f, tgg_2016f, tgg_2017f, tgg_2018f, tgg_2019f, tgg_2020f)
+
+```
+```{r }
+appendedDfAllYearsOppTsPct2 <- rbind(tgg_dft, tgg_dfZt, tgg_2004f, tgg_2005f, tgg_2006f, tgg_2007f, tgg_2008f, tgg_2009f, tgg_2010f, tgg_2011f, tgg_2012f, tgg_2013f, tgg_2014f, tgg_2015f, tgg_2016f, tgg_2017f, tgg_2018f, tgg_2019f, tgg_2020f)
+appendedDfAllYearsOppTsPct2
+```
+write.csv(appendedDfAllYearsTeamFloorPct,"C:\\Users\\brianrochford\\Downloads\\trFloorPct.csv", row.names = FALSE)
+```{r }
+write.csv(appendedDfAllYearsOppTsPct2,"C:\\Users\\brianrochford\\Downloads\\opponentTrueShootingPct.csv", row.names = FALSE)
+
+```
+```{r }
+appendedDfAllYearsOppOffensiveRebPct <- appendedDfAllYearsOppTsPct
+appendedDfAllYearsOppOffensiveRebPct
+```
+
+```{r }
+getKenPomYearData <- function(year)
+{
+    theUrl <- paste0("https://kenpom.com/index.php?y=", as.character(year))
+    page <- read_html(theUrl)
+    tables <- page %>% html_nodes("table") %>% html_table()
+    data <- as.data.frame(tables[1])
+
+    colnames(data) <- c("Rank", "Team", "Conf", "Record", "AdjEM", "AdjO", 
+         "AdjO_R", "AdjD", "AdjD_R", "AdjT", "AdjT_R",
+         "Luck", "Luck_R", "SoS_AdjEM", "SoS_AdjEM_R", 
+         "OppO", "OppO_R", "OppD", "OppD_R", "NC_AdjEM", "NC_AdjEM_R")
+
+    data <- data %>% filter(!str_detect(Rank, "Rk")) # Remove label row
+
+    data <- data %>% filter(nchar(as.character(Rank)) > 0) # Remove empty rank rows.
+    data$Year = year
+
+    return(data)
+}
+```
+
+```{r }
+library(XML)
+library(rvest)
+library(stringr)
+library(dplyr)
+
+kenPomData <- data.frame()
+inputPath <- "2019Data\\" # Location for storing the data to be used as an input to the ML work.
+
+# For training purposes, get all data before the current year. Aggregate into a single data frame.
+for (year in 2002:2018)
+{
+    kenPomYear <- getKenPomYearData(year)
+    kenPomData <- rbind(kenPomData, kenPomYear)
+}
+
+write.csv(kenPomData, paste0(inputPath, "KenPomDataRaw.csv"), row.names=F)
+
+# For the features needed for predicting the current year, get just the current year's data.
+kenPom2019 <- getKenPomYearData(2019)
+write.csv(kenPom2019, paste0(inputPath, "KenPomDataRaw2019.csv"), row.names=F)
+
+
+
+```
+
+```{r }
+kenPomData
+```
+#Opponent rebounding % Team Ranking
+```{r }
+i <- 1
+#https://www.teamrankings.com/ncaa-basketball/stat/floor-percentage?date=2002-04-02 
+dates <- list("2002-04-02", "2003-04-08", "2004-04-06", "2005-04-05", "2006-04-04", "2007-04-03", "2008-04-08", "2009-04-07", "2010-04-06", "2011-04-04", "2012-04-02", "2013-04-08", "2014-04-07", "2015-04-06", "2016-04-05", "2017-04-04", "2018-04-03", "2019-04-09", "2020-03-12")
+while (i < 20) {
+  rtg_urlt <- paste("https://www.teamrankings.com/ncaa-basketball/stat/opponent-offensive-rebounding-pct?date=",dates[i],sep="")
+  if (i == 1) {
+    rtgg_rawtr <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+
+  (rtgg_dft <- rtgg_rawtr[[1]])
+  rtgg_dft["season"] <- "2002"
+    
+    
+  }
+  if (i == 2) {
+    rtgg_raw2tr <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_dfZt <- rtgg_raw2tr[[1]])
+  rtgg_dfZt["season"] <- "2003"
+    
+  }
+  if (i == 3) {
+    rtgg_2004 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2004f <- rtgg_2004[[1]])
+  rtgg_2004f["season"] <- "2004"
+    
+  }
+  if (i == 4) {
+    rtgg_2005 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2005f <- rtgg_2005[[1]])
+  rtgg_2005f["season"] <- "2005"
+    
+  }
+  if (i == 5) {
+    rtgg_2006 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2006f <- rtgg_2006[[1]])
+  rtgg_2006f["season"] <- "2006"
+    
+  }
+  if (i == 6) {
+    rtgg_2007 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2007f <- rtgg_2007[[1]])
+  rtgg_2007f["season"] <- "2007"
+    
+  }
+  if (i == 7) {
+    rtgg_2008 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2008f <- rtgg_2008[[1]])
+  rtgg_2008f["season"] <- "2008"
+    
+  }
+  if (i == 8) {
+    rtgg_2009 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2009f <- rtgg_2009[[1]])
+  rtgg_2009f["season"] <- "2009"
+    
+  }
+  if (i == 9) {
+    rtgg_2010 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2010f <- rtgg_2010[[1]])
+  rtgg_2010f["season"] <- "2010"
+    
+  }
+  if (i == 10) {
+    rtgg_2011 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2011f <- rtgg_2011[[1]])
+  rtgg_2011f["season"] <- "2011"
+    
+  }
+  if (i == 11) {
+    rtgg_2012 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2012f <- rtgg_2012[[1]])
+  rtgg_2012f["season"] <- "2012"
+    
+  }
+  if (i == 12) {
+    rtgg_2013 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2013f <- rtgg_2013[[1]])
+  rtgg_2013f["season"] <- "2013"
+    
+  }
+  if (i == 13) {
+    rtgg_2014 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2014f <- rtgg_2014[[1]])
+  rtgg_2014f["season"] <- "2014"
+    
+  }
+  if (i == 14) {
+    rtgg_2015 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2015f <- rtgg_2015[[1]])
+  rtgg_2015f["season"] <- "2015"
+    
+  }
+  if (i == 15) {
+    rtgg_2016 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2016f <- rtgg_2016[[1]])
+  rtgg_2016f["season"] <- "2016"
+    
+  }
+  if (i == 16) {
+    rtgg_2017 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2017f <- rtgg_2017[[1]])
+  rtgg_2017f["season"] <- "2017"
+    
+  }
+  if (i == 17) {
+    rtgg_2018 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2018f <- rtgg_2018[[1]])
+  rtgg_2018f["season"] <- "2018"
+    
+  }
+  if (i == 18) {
+    rtgg_2019 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2019f <- rtgg_2019[[1]])
+  rtgg_2019f["season"] <- "2019"
+    
+  }
+  if (i == 19) {
+    rtgg_2020 <- rtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (rtgg_2020f <- rtgg_2020[[1]])
+  rtgg_2020f["season"] <- "2020"
+    
+  }
+  
+    
+
+  
+  i <- i + 1
+  
+}
+appendedDfAllYearsOppOffensiveRebPct <- rbind(rtgg_dft, rtgg_dfZt, rtgg_2004f, rtgg_2005f, rtgg_2006f, rtgg_2007f, rtgg_2008f, rtgg_2009f, rtgg_2010f, rtgg_2011f, rtgg_2012f, rtgg_2013f, rtgg_2014f, rtgg_2015f, rtgg_2016f, rtgg_2017f, rtgg_2018f, rtgg_2019f, rtgg_2020f)
+
+```
+```{r }
+write.csv(appendedDfAllYearsOppOffensiveRebPct,"C:\\Users\\brianrochford\\Downloads\\opponentOffensiveRebPct.csv", row.names = FALSE)
+
+
+```
+
+#Team Ranking stats: team floor %,opponent true shooting %, opponent offensive rebound %, 2006 and on last 10 games of season, #need: defensive rebound %, opponent defensive rebound %, opponent effective field goal percentage, opponent floor %
+
+```{r }
+i <- 1
+#https://www.teamrankings.com/ncaa-basketball/stat/floor-percentage?date=2002-04-02 
+dates <- list("2002-04-02", "2003-04-08", "2004-04-06", "2005-04-05", "2006-04-04", "2007-04-03", "2008-04-08", "2009-04-07", "2010-04-06", "2011-04-04", "2012-04-02", "2013-04-08", "2014-04-07", "2015-04-06", "2016-04-05", "2017-04-04", "2018-04-03", "2019-04-09", "2020-03-12")
+while (i < 20) {
+  drtg_urlt <- paste("https://www.teamrankings.com/ncaa-basketball/stat/defensive-rebounding-pct?date=",dates[i],sep="")
+  if (i == 1) {
+    drtgg_rawtr <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+
+  (drtgg_dft <- drtgg_rawtr[[1]])
+  drtgg_dft["season"] <- "2002"
+    
+    
+  }
+  if (i == 2) {
+    drtgg_raw2tr <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_dfZt <- drtgg_raw2tr[[1]])
+  drtgg_dfZt["season"] <- "2003"
+    
+  }
+  if (i == 3) {
+    drtgg_2004 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2004f <- drtgg_2004[[1]])
+  drtgg_2004f["season"] <- "2004"
+    
+  }
+  if (i == 4) {
+    drtgg_2005 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2005f <- drtgg_2005[[1]])
+  drtgg_2005f["season"] <- "2005"
+    
+  }
+  if (i == 5) {
+    drtgg_2006 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2006f <- drtgg_2006[[1]])
+  drtgg_2006f["season"] <- "2006"
+    
+  }
+  if (i == 6) {
+    drtgg_2007 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2007f <- drtgg_2007[[1]])
+  drtgg_2007f["season"] <- "2007"
+    
+  }
+  if (i == 7) {
+    drtgg_2008 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2008f <- drtgg_2008[[1]])
+  drtgg_2008f["season"] <- "2008"
+    
+  }
+  if (i == 8) {
+    drtgg_2009 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2009f <- drtgg_2009[[1]])
+  drtgg_2009f["season"] <- "2009"
+    
+  }
+  if (i == 9) {
+    drtgg_2010 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2010f <- drtgg_2010[[1]])
+  drtgg_2010f["season"] <- "2010"
+    
+  }
+  if (i == 10) {
+    drtgg_2011 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2011f <- drtgg_2011[[1]])
+  drtgg_2011f["season"] <- "2011"
+    
+  }
+  if (i == 11) {
+    drtgg_2012 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2012f <- drtgg_2012[[1]])
+  drtgg_2012f["season"] <- "2012"
+    
+  }
+  if (i == 12) {
+    drtgg_2013 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2013f <- drtgg_2013[[1]])
+  drtgg_2013f["season"] <- "2013"
+    
+  }
+  if (i == 13) {
+    drtgg_2014 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2014f <- drtgg_2014[[1]])
+  drtgg_2014f["season"] <- "2014"
+    
+  }
+  if (i == 14) {
+    drtgg_2015 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2015f <- drtgg_2015[[1]])
+  drtgg_2015f["season"] <- "2015"
+    
+  }
+  if (i == 15) {
+    drtgg_2016 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2016f <- drtgg_2016[[1]])
+  drtgg_2016f["season"] <- "2016"
+    
+  }
+  if (i == 16) {
+    drtgg_2017 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2017f <- drtgg_2017[[1]])
+  drtgg_2017f["season"] <- "2017"
+    
+  }
+  if (i == 17) {
+    drtgg_2018 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2018f <- drtgg_2018[[1]])
+  drtgg_2018f["season"] <- "2018"
+    
+  }
+  if (i == 18) {
+    drtgg_2019 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2019f <- drtgg_2019[[1]])
+  drtgg_2019f["season"] <- "2019"
+    
+  }
+  if (i == 19) {
+    drtgg_2020 <- drtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (drtgg_2020f <- drtgg_2020[[1]])
+  drtgg_2020f["season"] <- "2020"
+    
+  }
+  
+    
+
+  
+  i <- i + 1
+  
+}
+appendedDfAllYearsDefensiveRebPct <- rbind(drtgg_dft, drtgg_dfZt, drtgg_2004f, drtgg_2005f, drtgg_2006f, drtgg_2007f, drtgg_2008f, drtgg_2009f, drtgg_2010f, drtgg_2011f, drtgg_2012f, drtgg_2013f, drtgg_2014f, drtgg_2015f, drtgg_2016f, drtgg_2017f, drtgg_2018f, drtgg_2019f, drtgg_2020f)
+
+```
+
+```{r }
+appendedDfAllYearsDefensiveRebPct
+```
+```{r }
+write.csv(appendedDfAllYearsDefensiveRebPct,"C:\\Users\\brianrochford\\Downloads\\DefensiveRebPct.csv", row.names = FALSE)
+
+```
+#opponent defensive rebounding pct (good stat lines up with 2004 madness bracket well, lower # is better)
+```{r }
+i <- 1
+#https://www.teamrankings.com/ncaa-basketball/stat/floor-percentage?date=2002-04-02 
+dates <- list("2002-04-02", "2003-04-08", "2004-04-06", "2005-04-05", "2006-04-04", "2007-04-03", "2008-04-08", "2009-04-07", "2010-04-06", "2011-04-04", "2012-04-02", "2013-04-08", "2014-04-07", "2015-04-06", "2016-04-05", "2017-04-04", "2018-04-03", "2019-04-09", "2020-03-12")
+while (i < 20) {
+  odrtg_urlt <- paste("https://www.teamrankings.com/ncaa-basketball/stat/opponent-defensive-rebounding-pct?date=",dates[i],sep="")
+  if (i == 1) {
+    odrtgg_rawtr <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+
+  (odrtgg_dft <- odrtgg_rawtr[[1]])
+  odrtgg_dft["season"] <- "2002"
+    
+    
+  }
+  if (i == 2) {
+    odrtgg_raw2tr <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_dfZt <- odrtgg_raw2tr[[1]])
+  odrtgg_dfZt["season"] <- "2003"
+    
+  }
+  if (i == 3) {
+    odrtgg_2004 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2004f <- odrtgg_2004[[1]])
+  odrtgg_2004f["season"] <- "2004"
+    
+  }
+  if (i == 4) {
+    odrtgg_2005 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2005f <- odrtgg_2005[[1]])
+  odrtgg_2005f["season"] <- "2005"
+    
+  }
+  if (i == 5) {
+    odrtgg_2006 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2006f <- odrtgg_2006[[1]])
+  odrtgg_2006f["season"] <- "2006"
+    
+  }
+  if (i == 6) {
+    odrtgg_2007 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2007f <- odrtgg_2007[[1]])
+  odrtgg_2007f["season"] <- "2007"
+    
+  }
+  if (i == 7) {
+    odrtgg_2008 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2008f <- odrtgg_2008[[1]])
+  odrtgg_2008f["season"] <- "2008"
+    
+  }
+  if (i == 8) {
+    odrtgg_2009 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2009f <- odrtgg_2009[[1]])
+  odrtgg_2009f["season"] <- "2009"
+    
+  }
+  if (i == 9) {
+    odrtgg_2010 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2010f <- odrtgg_2010[[1]])
+  odrtgg_2010f["season"] <- "2010"
+    
+  }
+  if (i == 10) {
+    odrtgg_2011 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2011f <- odrtgg_2011[[1]])
+  odrtgg_2011f["season"] <- "2011"
+    
+  }
+  if (i == 11) {
+    odrtgg_2012 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2012f <- odrtgg_2012[[1]])
+  odrtgg_2012f["season"] <- "2012"
+    
+  }
+  if (i == 12) {
+    odrtgg_2013 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2013f <- odrtgg_2013[[1]])
+  odrtgg_2013f["season"] <- "2013"
+    
+  }
+  if (i == 13) {
+    odrtgg_2014 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2014f <- odrtgg_2014[[1]])
+  odrtgg_2014f["season"] <- "2014"
+    
+  }
+  if (i == 14) {
+    odrtgg_2015 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2015f <- odrtgg_2015[[1]])
+  odrtgg_2015f["season"] <- "2015"
+    
+  }
+  if (i == 15) {
+    odrtgg_2016 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2016f <- odrtgg_2016[[1]])
+  odrtgg_2016f["season"] <- "2016"
+    
+  }
+  if (i == 16) {
+    odrtgg_2017 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2017f <- odrtgg_2017[[1]])
+  odrtgg_2017f["season"] <- "2017"
+    
+  }
+  if (i == 17) {
+    odrtgg_2018 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2018f <- odrtgg_2018[[1]])
+  odrtgg_2018f["season"] <- "2018"
+    
+  }
+  if (i == 18) {
+    odrtgg_2019 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2019f <- odrtgg_2019[[1]])
+  odrtgg_2019f["season"] <- "2019"
+    
+  }
+  if (i == 19) {
+    odrtgg_2020 <- odrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (odrtgg_2020f <- odrtgg_2020[[1]])
+  odrtgg_2020f["season"] <- "2020"
+    
+  }
+  
+    
+
+  
+  i <- i + 1
+  
+}
+appendedDfAllYearsOpponentDefensiveRebPct <- rbind(odrtgg_dft, odrtgg_dfZt, odrtgg_2004f, odrtgg_2005f, odrtgg_2006f, odrtgg_2007f, odrtgg_2008f, odrtgg_2009f, odrtgg_2010f, odrtgg_2011f, odrtgg_2012f, odrtgg_2013f, odrtgg_2014f, odrtgg_2015f, odrtgg_2016f, odrtgg_2017f, odrtgg_2018f, odrtgg_2019f, odrtgg_2020f)
+
+```
+
+```{r }
+appendedDfAllYearsOpponentDefensiveRebPct
+```
+#need offensive rebound pct
+```{r }
+write.csv(appendedDfAllYearsOpponentDefensiveRebPct,"C:\\Users\\brianrochford\\Downloads\\OpponentDefensiveRebPct.csv", row.names = FALSE)
+
+```
+#opponent effective field goal percent really good UConn #1 they won in 2004, GA tech made to finals and were ranked 5 
+```{r }
+i <- 1
+#https://www.teamrankings.com/ncaa-basketball/stat/floor-percentage?date=2002-04-02 
+dates <- list("2002-04-02", "2003-04-08", "2004-04-06", "2005-04-05", "2006-04-04", "2007-04-03", "2008-04-08", "2009-04-07", "2010-04-06", "2011-04-04", "2012-04-02", "2013-04-08", "2014-04-07", "2015-04-06", "2016-04-05", "2017-04-04", "2018-04-03", "2019-04-09", "2020-03-12")
+while (i < 20) {
+  fodrtg_urlt <- paste("https://www.teamrankings.com/ncaa-basketball/stat/opponent-effective-field-goal-pct?date=",dates[i],sep="")
+  if (i == 1) {
+    fodrtgg_rawtr <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+
+  (fodrtgg_dft <- fodrtgg_rawtr[[1]])
+  fodrtgg_dft["season"] <- "2002"
+    
+    
+  }
+  if (i == 2) {
+    fodrtgg_raw2tr <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_dfZt <- fodrtgg_raw2tr[[1]])
+  fodrtgg_dfZt["season"] <- "2003"
+    
+  }
+  if (i == 3) {
+    fodrtgg_2004 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2004f <- fodrtgg_2004[[1]])
+  fodrtgg_2004f["season"] <- "2004"
+    
+  }
+  if (i == 4) {
+    fodrtgg_2005 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2005f <- fodrtgg_2005[[1]])
+  fodrtgg_2005f["season"] <- "2005"
+    
+  }
+  if (i == 5) {
+    fodrtgg_2006 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2006f <- fodrtgg_2006[[1]])
+  fodrtgg_2006f["season"] <- "2006"
+    
+  }
+  if (i == 6) {
+    fodrtgg_2007 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2007f <- fodrtgg_2007[[1]])
+  fodrtgg_2007f["season"] <- "2007"
+    
+  }
+  if (i == 7) {
+    fodrtgg_2008 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2008f <- fodrtgg_2008[[1]])
+  fodrtgg_2008f["season"] <- "2008"
+    
+  }
+  if (i == 8) {
+    fodrtgg_2009 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2009f <- fodrtgg_2009[[1]])
+  fodrtgg_2009f["season"] <- "2009"
+    
+  }
+  if (i == 9) {
+    fodrtgg_2010 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2010f <- fodrtgg_2010[[1]])
+  fodrtgg_2010f["season"] <- "2010"
+    
+  }
+  if (i == 10) {
+    fodrtgg_2011 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2011f <- fodrtgg_2011[[1]])
+  fodrtgg_2011f["season"] <- "2011"
+    
+  }
+  if (i == 11) {
+    fodrtgg_2012 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2012f <- fodrtgg_2012[[1]])
+  fodrtgg_2012f["season"] <- "2012"
+    
+  }
+  if (i == 12) {
+    fodrtgg_2013 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2013f <- fodrtgg_2013[[1]])
+  fodrtgg_2013f["season"] <- "2013"
+    
+  }
+  if (i == 13) {
+    fodrtgg_2014 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2014f <- fodrtgg_2014[[1]])
+  fodrtgg_2014f["season"] <- "2014"
+    
+  }
+  if (i == 14) {
+    fodrtgg_2015 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2015f <- fodrtgg_2015[[1]])
+  fodrtgg_2015f["season"] <- "2015"
+    
+  }
+  if (i == 15) {
+    fodrtgg_2016 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2016f <- fodrtgg_2016[[1]])
+  fodrtgg_2016f["season"] <- "2016"
+    
+  }
+  if (i == 16) {
+    fodrtgg_2017 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2017f <- fodrtgg_2017[[1]])
+  fodrtgg_2017f["season"] <- "2017"
+    
+  }
+  if (i == 17) {
+    fodrtgg_2018 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2018f <- fodrtgg_2018[[1]])
+  fodrtgg_2018f["season"] <- "2018"
+    
+  }
+  if (i == 18) {
+    fodrtgg_2019 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2019f <- fodrtgg_2019[[1]])
+  fodrtgg_2019f["season"] <- "2019"
+    
+  }
+  if (i == 19) {
+    fodrtgg_2020 <- fodrtg_urlt %>% 
+      read_html() %>% 
+      html_nodes("table") %>% 
+      html_table(fill = TRUE, header = FALSE)
+  (fodrtgg_2020f <- fodrtgg_2020[[1]])
+  fodrtgg_2020f["season"] <- "2020"
+    
+  }
+  
+    
+
+  
+  i <- i + 1
+  
+}
+appendedDfAllYearsOpponentEffectiveFgPct <- rbind(fodrtgg_dft, fodrtgg_dfZt, fodrtgg_2004f, fodrtgg_2005f, fodrtgg_2006f, fodrtgg_2007f, fodrtgg_2008f, fodrtgg_2009f, fodrtgg_2010f, fodrtgg_2011f, fodrtgg_2012f, fodrtgg_2013f, fodrtgg_2014f, fodrtgg_2015f, fodrtgg_2016f, fodrtgg_2017f, fodrtgg_2018f, fodrtgg_2019f, fodrtgg_2020f)
+
+```
+
+```{r }
+appendedDfAllYearsOpponentEffectiveFgPct
+```
+```{r }
+write.csv(appendedDfAllYearsOpponentEffectiveFgPct,"C:\\Users\\brianrochford\\Downloads\\OpponentEffectiveFieldGoalPct.csv", row.names = FALSE)
+```
+
+```{r }
+gg_dfZt["season"] <- "2003"
+```
+```{r }
+gg_dfZt
+```
+```{r }
+appendedDF <- rbind(gg_dft, gg_dfZt)
+appendedDF
+```
+
+
+dt1 <- data.table(df1, key = "CustomerId") 
+dt2 <- data.table(df2, key = "CustomerId")
+
+joined.dt1.dt.2 <- dt1[dt2]
