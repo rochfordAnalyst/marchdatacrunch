@@ -2,6 +2,6 @@ https://marchdatacrunchmaster07784.gatsbyjs.io/
 
 Created and Tinkered with multiple Machine Learning Models to Attempt to Accurately Predict March Madness using Historical Data. Presented our model results and interpretations to a panel of judges.
 
-Performance tracking of each Teams Model Log Loss
+Performance tracking of each Teams Model Log Loss:
 
 http://bracket.fordhammarchdatacrunchmadness.com/
